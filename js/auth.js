@@ -9,7 +9,7 @@
 // The main app shell is hidden until login/register succeeds.
 //
 // Set this to your Cloudflare Worker URL:
-const CF_WORKER_URL = 'https://contractforge-api.YOUR-SUBDOMAIN.workers.dev';
+const CF_WORKER_URL = 'contractforge-api.tylerhat12.workers.dev';
 // ============================================================
 
 (function () {
