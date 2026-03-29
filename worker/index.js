@@ -6,16 +6,25 @@ const CORS_HEADERS = {
 
 export default {
   async fetch(request, env) {
+    // Always handle preflight
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: CORS_HEADERS });
+      return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
+
     const url      = new URL(request.url);
     const pathname = url.pathname;
+
+    // Ignore favicon requests
+    if (pathname === '/favicon.ico') {
+      return new Response(null, { status: 204, headers: CORS_HEADERS });
+    }
+
     try {
       if (pathname === '/api/contracts') {
         if (request.method === 'GET')  return await listContracts(env);
         if (request.method === 'POST') return await createContract(request, env);
       }
+
       const match = pathname.match(/^\/api\/contracts\/([^/]+)$/);
       if (match) {
         const id = match[1];
@@ -23,7 +32,9 @@ export default {
         if (request.method === 'PUT')    return await updateContract(id, request, env);
         if (request.method === 'DELETE') return await deleteContract(id, env);
       }
+
       return json({ error: 'Not found' }, 404);
+
     } catch (err) {
       console.error(err);
       return json({ error: 'Internal server error', detail: err.message }, 500);
@@ -76,6 +87,10 @@ async function deleteContract(id, env) {
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    headers: {
+      ...CORS_HEADERS,
+      'Content-Type': 'application/json',
+      'X-Content-Type-Options': 'nosniff',
+    },
   });
 }

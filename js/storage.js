@@ -3,8 +3,40 @@
  * Syncs to Cloudflare Worker API with localStorage as local cache.
  */
 
-const API_BASE   = 'https://contractforge-api.tylerhat12.workers.dev/api';
+const API_BASE    = 'https://contractforge-api.tylerhat12.workers.dev/api';
 const STORAGE_KEY = 'contractforge_v2';
+
+// ── UI helpers (defined first so all functions can call them) ──────
+
+function showSyncStatus(state) {
+  const el = document.getElementById('save-indicator');
+  if (!el) return;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  const messages = {
+    syncing: '⟳ Syncing...',
+    saved:   '✓ Saved',
+    error:   '⚠ Offline — saved locally',
+  };
+  el.textContent = messages[state] || '';
+  el.style.color = state === 'error' ? 'var(--accent3)' : 'var(--accent2)';
+  el.classList.add('show');
+  if (state !== 'syncing') setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function flashSaveIndicator() {
+  const el = document.getElementById('save-indicator');
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+function download(filename, text) {
+  const a    = document.createElement('a');
+  a.href     = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+  a.download = filename;
+  a.click();
+}
 
 // ── Local cache ────────────────────────────────────────────────────
 
@@ -21,7 +53,7 @@ function loadLocal() {
   }
 }
 
-// ── API ────────────────────────────────────────────────────────────
+// ── API fetch helper ───────────────────────────────────────────────
 
 async function apiFetch(path, options = {}) {
   const res = await fetch(API_BASE + path, {
@@ -35,14 +67,24 @@ async function apiFetch(path, options = {}) {
   return res.json();
 }
 
+// ── Server sync ────────────────────────────────────────────────────
+
 async function loadFromServer() {
   try {
     showSyncStatus('syncing');
     const rows = await apiFetch('/contracts');
-    const fetched = await Promise.all(rows.map(row => apiFetch(`/contracts/${row.id}`)));
+    const fetched = await Promise.all(
+      rows.map(row => apiFetch(`/contracts/${row.id}`))
+    );
     contracts = {};
     fetched.forEach(row => {
-      contracts[row.id] = { id: row.id, title: row.title, type: row.type, value: row.value, ...row.data };
+      contracts[row.id] = {
+        id:    row.id,
+        title: row.title,
+        type:  row.type,
+        value: row.value,
+        ...row.data,
+      };
     });
     saveLocal();
     showSyncStatus('saved');
@@ -61,11 +103,19 @@ async function saveAll() {
   const payload = { id, title, type, value, data };
   try {
     showSyncStatus('syncing');
-    const exists = await apiFetch(`/contracts/${id}`).then(() => true).catch(() => false);
+    const exists = await apiFetch(`/contracts/${id}`)
+      .then(() => true)
+      .catch(() => false);
     if (exists) {
-      await apiFetch(`/contracts/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      await apiFetch(`/contracts/${id}`, {
+        method: 'PUT',
+        body:   JSON.stringify(payload),
+      });
     } else {
-      await apiFetch('/contracts', { method: 'POST', body: JSON.stringify(payload) });
+      await apiFetch('/contracts', {
+        method: 'POST',
+        body:   JSON.stringify(payload),
+      });
     }
     showSyncStatus('saved');
   } catch (err) {
@@ -85,9 +135,9 @@ async function deleteContractFromServer(id) {
   saveLocal();
 }
 
+// ── Boot ───────────────────────────────────────────────────────────
+
 async function loadAll() {
   loadLocal();
   await loadFromServer();
 }
-
-// ── UI helpers ──────────────────────────────────
