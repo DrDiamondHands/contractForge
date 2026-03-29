@@ -7,16 +7,16 @@
   --surface:  #1a1a1a;
   --surface2: #2a2a2a;
   --border:   #444444;
-  --accent:   #ff00ff; /* Neon magenta */
-  --accent2:  #00ffff; /* Neon cyan */
-  --accent3:  #ffaa00; /* Neon orange */
+  --accent:   #ffaa00; /* Neon magenta */
+  --accent2:  #00ff55; /* Neon cyan */
+  --accent3:  #ff0040; /* Neon orange */
   --danger:   #ff0040; /* Neon red */
   --text:     #ffffff;
   --muted:    #aaaaaa;
   --mono:     'IBM Plex Mono', monospace;
   --sans:     'IBM Plex Sans', sans-serif;
-  --glow:     0 0 10px rgba(255, 0, 255, 0.5);
-  --glow2:    0 0 10px rgba(0, 255, 255, 0.5);
+  --glow:     0 0 10px rgba(255, 0, 0, 0.5);
+  --glow2:    0 0 10px rgba(0, 68, 255, 0.5);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
