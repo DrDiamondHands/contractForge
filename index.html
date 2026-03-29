@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContractForge — Federal Contract File Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="logo">Contract<span>Forge</span></div>
+  <div class="contract-selector">
+    <select id="contract-switcher" onchange="switchContract(this.value)">
+      <option value="">— Select Contract File —</option>
+    </select>
+    <button onclick="openNewContractModal()">+ New Contract</button>
+    <span class="save-indicator" id="save-indicator">✓ Saved</span>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- ═══════════════ SIDEBAR NAV ═══════════════ -->
+  <nav>
+    <div class="nav-section">Overview</div>
+    <a class="active" onclick="showPanel('dashboard')" id="nav-dashboard">
+      <span class="icon">⬛</span> Dashboard
+    </a>
+
+    <div class="nav-section">Build File</div>
+    <a onclick="showPanel('checklist')" id="nav-checklist">
+      <span class="icon">☑</span> Document Checklist
+    </a>
+    <a onclick="showPanel('clauses')" id="nav-clauses">
+      <span class="icon">§</span> FAR/DFARS Clauses
+    </a>
+    <a onclick="showPanel('folder')" id="nav-folder">
+      <span class="icon">📁</span> Folder Structure
+    </a>
+
+    <div class="nav-section">Forms</div>
+    <a onclick="showPanel('sf1449')" id="nav-sf1449">
+      <span class="icon">📄</span> SF-1449
+    </a>
+    <a onclick="showPanel('dd1155')" id="nav-dd1155">
+      <span class="icon">📄</span> DD-1155
+    </a>
+    <a onclick="showPanel('pws')" id="nav-pws">
+      <span class="icon">📋</span> PWS / SOW Builder
+    </a>
+
+    <div class="nav-section">AI Assistant</div>
+    <a onclick="showPanel('ai')" id="nav-ai">
+      <span class="icon">✦</span> AI Draft Assistant
+    </a>
+  </nav>
+
+  <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+  <main>
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="panel-title">Overview</div>
+      <h1 id="dash-title">Contract File Builder <span class="contract-type-pill" id="dash-type-pill">No File Selected</span></h1>
+
+      <div id="no-contract-notice" class="notice">
+        ⓘ No contract file selected. Create a new contract or select one from the header to get started.
+      </div>
+
+      <div id="dash-content" style="display:none">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Checklist Progress</div>
+            <div class="stat-value" id="stat-progress" style="color:var(--accent2)">0%</div>
+            <div class="stat-sub" id="stat-progress-sub">0 of 0 items complete</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Selected Clauses</div>
+            <div class="stat-value" id="stat-clauses" style="color:var(--accent)">0</div>
+            <div class="stat-sub">FAR/DFARS clauses</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Contract Type</div>
+            <div class="stat-value" id="stat-type" style="color:var(--accent3);font-size:1rem;padding-top:8px">—</div>
+            <div class="stat-sub" id="stat-type-sub">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Est. Value</div>
+            <div class="stat-value" id="stat-value" style="color:var(--accent2)">$0</div>
+            <div class="stat-sub" id="stat-value-sub">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Contract Info</h2>
+          <div class="card-row three">
+            <div class="form-group">
+              <label>Contract Number</label>
+              <input type="text" id="ci-number" placeholder="e.g. W912DY-26-C-0001" oninput="saveContractInfo()">
+            </div>
+            <div class="form-group">
+              <label>Solicitation Number</label>
+              <input type="text" id="ci-sol" placeholder="e.g. W912DY-26-R-0001" oninput="saveContractInfo()">
+            </div>
+            <div class="form-group">
+              <label>Award Date</label>
+              <input type="date" id="ci-award-date" oninput="saveContractInfo()">
+            </div>
+          </div>
+          <div class="card-row three">
+            <div class="form-group">
+              <label>Contracting Officer</label>
+              <input type="text" id="ci-co" placeholder="Name" oninput="saveContractInfo()">
+            </div>
+            <div class="form-group">
+              <label>Contractor Name</label>
+              <input type="text" id="ci-contractor" placeholder="Company name" oninput="saveContractInfo()">
+            </div>
+            <div class="form-group">
+              <label>Contractor CAGE</label>
+              <input type="text" id="ci-cage" placeholder="5-char CAGE code" oninput="saveContractInfo()">
+            </div>
+          </div>
+          <div class="card-row">
+            <div class="form-group">
+              <label>Estimated Value ($)</label>
+              <input type="number" id="ci-value" placeholder="0.00" oninput="saveContractInfo()">
+            </div>
+            <div class="form-group">
+              <label>Period of Performance End</label>
+              <input type="date" id="ci-pop" oninput="saveContractInfo()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description of Requirement</label>
+            <textarea id="ci-desc" placeholder="Brief description of what is being acquired..." oninput="saveContractInfo()"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="panel" id="panel-checklist">
+      <div class="panel-title">Build File</div>
+      <h1>Document Checklist</h1>
+      <div id="checklist-no-contract" class="notice">Select or create a contract file first.</div>
+      <div id="checklist-content" style="display:none">
+        <div class="progress-label" id="cl-progress-label">0 of 0 documents complete</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="cl-progress-bar" style="width:0%"></div></div>
+        <div id="checklist-groups"></div>
+      </div>
+    </div>
+
+    <!-- FAR/DFARS CLAUSES -->
+    <div class="panel" id="panel-clauses">
+      <div class="panel-title">Build File</div>
+      <h1>FAR / DFARS Clause Builder</h1>
+      <div id="clauses-no-contract" class="notice">Select or create a contract file first.</div>
+      <div id="clauses-content" style="display:none">
+        <div class="tabs">
+          <div class="tab active" onclick="switchClauseTab('mandatory')">Mandatory</div>
+          <div class="tab" onclick="switchClauseTab('commercial')">Commercial (Part 12)</div>
+          <div class="tab" onclick="switchClauseTab('construction')">Construction</div>
+          <div class="tab" onclick="switchClauseTab('dfars')">DFARS</div>
+          <div class="tab" onclick="switchClauseTab('selected')">Selected (<span id="selected-clause-count">0</span>)</div>
+        </div>
+        <div id="clause-tab-mandatory" class="tab-panel active"></div>
+        <div id="clause-tab-commercial" class="tab-panel"></div>
+        <div id="clause-tab-construction" class="tab-panel"></div>
+        <div id="clause-tab-dfars" class="tab-panel"></div>
+        <div id="clause-tab-selected" class="tab-panel">
+          <div id="selected-clauses-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOLDER STRUCTURE -->
+    <div class="panel" id="panel-folder">
+      <div class="panel-title">Build File</div>
+      <h1>Contract File Folder Structure</h1>
+      <div id="folder-no-contract" class="notice">Select or create a contract file first.</div>
+      <div id="folder-content" style="display:none">
+        <div class="notice" style="color:var(--accent2);border-color:rgba(0,201,167,0.25);background:rgba(0,201,167,0.06)">
+          ✦ Folder structure auto-generated based on your contract type. Copy or export for use in KTFileShare / CON-IT.
+        </div>
+        <div id="folder-tree-output" class="folder-tree"></div>
+        <div class="btn-row mt-16">
+          <button class="btn btn-ghost btn-sm" onclick="copyFolderTree()">⧉ Copy to Clipboard</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportFolderList()">⬇ Export as .txt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SF-1449 -->
+    <div class="panel" id="panel-sf1449">
+      <div class="panel-title">Forms</div>
+      <h1>SF-1449 — Solicitation/Contract/Order</h1>
+      <div id="sf1449-no-contract" class="notice">Select or create a contract file first.</div>
+      <div id="sf1449-content" style="display:none">
+        <div class="notice">ℹ This builder pre-fills SF-1449 fields from your contract info. Review and complete all fields before exporting.</div>
+        <div class="form-section">
+          <h4>Block 1–7 — Contract Identification</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>1. Contract No.</label><input type="text" id="sf-contract-no" oninput="saveForms()"></div>
+            <div class="form-group"><label>2. Solicitation No.</label><input type="text" id="sf-sol-no" oninput="saveForms()"></div>
+            <div class="form-group"><label>3. Award/Effective Date</label><input type="date" id="sf-award-date" oninput="saveForms()"></div>
+            <div class="form-group"><label>4. Order Number</label><input type="text" id="sf-order-no" oninput="saveForms()"></div>
+            <div class="form-group"><label>5. Solicitation Type</label>
+              <select id="sf-sol-type" onchange="saveForms()"><option>RFP</option><option>RFQ</option><option>IFB</option></select>
+            </div>
+            <div class="form-group"><label>6. Solicitation Issued By</label><input type="text" id="sf-issued-by" oninput="saveForms()"></div>
+            <div class="form-group"><label>7. POC Name</label><input type="text" id="sf-poc-name" oninput="saveForms()"></div>
+            <div class="form-group"><label>7. Phone</label><input type="text" id="sf-poc-phone" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 9 — Contractor / Offeror</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Company Name</label><input type="text" id="sf-contractor" oninput="saveForms()"></div>
+            <div class="form-group"><label>CAGE Code</label><input type="text" id="sf-cage" oninput="saveForms()"></div>
+            <div class="form-group"><label>UEI</label><input type="text" id="sf-uei" oninput="saveForms()"></div>
+            <div class="form-group"><label>Address</label><input type="text" id="sf-address" oninput="saveForms()"></div>
+            <div class="form-group"><label>City</label><input type="text" id="sf-city" oninput="saveForms()"></div>
+            <div class="form-group"><label>State / ZIP</label><input type="text" id="sf-state-zip" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 10–15 — Acquisition Details</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Type of Contract</label>
+              <select id="sf-contract-type" onchange="saveForms()">
+                <option>Firm-Fixed-Price (FFP)</option>
+                <option>Cost-Plus-Fixed-Fee (CPFF)</option>
+                <option>Time-and-Materials (T&M)</option>
+                <option>Indefinite-Delivery/Indefinite-Quantity (IDIQ)</option>
+                <option>Requirements Contract</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Set-Aside</label>
+              <select id="sf-setaside" onchange="saveForms()">
+                <option>Total Small Business</option><option>8(a)</option><option>SDVOSB</option>
+                <option>WOSB</option><option>HUBZone</option><option>None (Full &amp; Open)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>NAICS Code</label><input type="text" id="sf-naics" oninput="saveForms()"></div>
+            <div class="form-group"><label>Small Business Size Standard</label><input type="text" id="sf-sbss" oninput="saveForms()"></div>
+            <div class="form-group"><label>Place of Performance</label><input type="text" id="sf-pop" oninput="saveForms()"></div>
+            <div class="form-group"><label>Performance Start</label><input type="date" id="sf-perf-start" oninput="saveForms()"></div>
+            <div class="form-group"><label>Performance End</label><input type="date" id="sf-perf-end" oninput="saveForms()"></div>
+            <div class="form-group"><label>Obligated Amount ($)</label><input type="number" id="sf-amount" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 17 — Accounting &amp; Appropriation Data</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Accounting Classification</label><input type="text" id="sf-accounting" placeholder="e.g. 21-1020-022-1220..." oninput="saveForms()"></div>
+            <div class="form-group"><label>Funding PR Number</label><input type="text" id="sf-pr-num" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 25–26 — Signatures</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Contracting Officer Name</label><input type="text" id="sf-co-name" oninput="saveForms()"></div>
+            <div class="form-group"><label>CO Warrant No.</label><input type="text" id="sf-co-warrant" oninput="saveForms()"></div>
+            <div class="form-group"><label>Signature Date</label><input type="date" id="sf-sig-date" oninput="saveForms()"></div>
+            <div class="form-group"><label>Contracting Office</label><input type="text" id="sf-co-office" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="export-bar">
+          <button class="btn btn-ghost btn-sm" onclick="prefillSF1449()">↺ Re-sync from Contract Info</button>
+          <button class="btn btn-primary btn-sm" onclick="exportFormText('SF-1449')">⬇ Export Summary</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DD-1155 -->
+    <div class="panel" id="panel-dd1155">
+      <div class="panel-title">Forms</div>
+      <h1>DD-1155 — Order for Supplies or Services</h1>
+      <div id="dd1155-no-contract" class="notice">Select or create a contract file first.</div>
+      <div id="dd1155-content" style="display:none">
+        <div class="form-section">
+          <h4>Block 1–5 — Order Identification</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>1. Order No.</label><input type="text" id="dd-order-no" oninput="saveForms()"></div>
+            <div class="form-group"><label>2. Date of Order</label><input type="date" id="dd-order-date" oninput="saveForms()"></div>
+            <div class="form-group"><label>3. Contract No.</label><input type="text" id="dd-contract-no" oninput="saveForms()"></div>
+            <div class="form-group"><label>4. Requisition / Ref No.</label><input type="text" id="dd-req-no" oninput="saveForms()"></div>
+            <div class="form-group"><label>5. Issuing Office</label><input type="text" id="dd-issuing-office" oninput="saveForms()"></div>
+            <div class="form-group"><label>5. Address</label><input type="text" id="dd-issuing-addr" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 6–9 — Vendor</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Vendor Name</label><input type="text" id="dd-vendor" oninput="saveForms()"></div>
+            <div class="form-group"><label>CAGE</label><input type="text" id="dd-cage" oninput="saveForms()"></div>
+            <div class="form-group"><label>Vendor Address</label><input type="text" id="dd-vendor-addr" oninput="saveForms()"></div>
+            <div class="form-group"><label>City / State / ZIP</label><input type="text" id="dd-vendor-city" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 10–14 — Delivery / Ship-To</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Ship-To Name / Activity</label><input type="text" id="dd-ship-name" oninput="saveForms()"></div>
+            <div class="form-group"><label>Ship-To Address</label><input type="text" id="dd-ship-addr" oninput="saveForms()"></div>
+            <div class="form-group"><label>Required Delivery Date</label><input type="date" id="dd-delivery-date" oninput="saveForms()"></div>
+            <div class="form-group"><label>F.O.B. Point</label>
+              <select id="dd-fob" onchange="saveForms()"><option>Destination</option><option>Origin</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 15 — Line Items</h4>
+          <div id="dd-line-items"></div>
+          <button class="btn btn-ghost btn-sm mt-8" onclick="addLineItem()">+ Add Line Item</button>
+        </div>
+        <div class="form-section">
+          <h4>Block 16 — Accounting &amp; Appropriation</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Accounting Classification</label><input type="text" id="dd-accounting" oninput="saveForms()"></div>
+            <div class="form-group"><label>Total Amount ($)</label><input type="number" id="dd-total" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h4>Block 17 — CO Signature</h4>
+          <div class="field-grid">
+            <div class="form-group"><label>Contracting Officer Name</label><input type="text" id="dd-co-name" oninput="saveForms()"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="dd-sig-date" oninput="saveForms()"></div>
+          </div>
+        </div>
+        <div class="export-bar">
+          <button class="btn btn-ghost btn-sm" onclick="prefillDD1155()">↺ Re-sync from Contract Info</button>
+          <button class="btn btn-primary btn-sm" onclick="exportFormText('DD-1155')">⬇ Export Summary</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PWS / SOW -->
+    <div class="panel" id="panel-pws">
+      <div class="panel-title">Forms</div>
+      <h1>Performance Work Statement / SOW Builder</h1>
+      <div id="pws-no-contract" class="notice">Select or create a contract file first.</div>
+      <div id="pws-content" style="display:none">
+        <div class="tabs">
+          <div class="tab active" onclick="switchPWSTab('pws')">PWS</div>
+          <div class="tab" onclick="switchPWSTab('sow')">SOW</div>
+        </div>
+        <div id="pws-tab-pws" class="tab-panel active">
+          <div class="form-section">
+            <h4>1.0 — Purpose &amp; Background</h4>
+            <div class="form-group"><label>1.1 Purpose</label><textarea id="pws-purpose" rows="4" placeholder="State the purpose of this contract..." oninput="saveForms()"></textarea></div>
+            <div class="form-group"><label>1.2 Background</label><textarea id="pws-background" rows="4" placeholder="Background information on the requirement..." oninput="saveForms()"></textarea></div>
+          </div>
+          <div class="form-section">
+            <h4>2.0 — Scope</h4>
+            <div class="form-group"><label>2.1 Scope of Work</label><textarea id="pws-scope" rows="5" placeholder="Define the overall scope..." oninput="saveForms()"></textarea></div>
+          </div>
+          <div class="form-section">
+            <h4>3.0 — Tasks</h4>
+            <div id="pws-tasks"></div>
+            <button class="btn btn-ghost btn-sm mt-8" onclick="addPWSTask()">+ Add Task</button>
+          </div>
+          <div class="form-section">
+            <h4>4.0 — Deliverables</h4>
+            <div class="form-group"><label>Deliverables Description</label><textarea id="pws-deliverables" rows="4" placeholder="List all deliverables, formats, and schedules..." oninput="saveForms()"></textarea></div>
+          </div>
+          <div class="form-section">
+            <h4>5.0 — GFE / GFI</h4>
+            <div class="form-group"><label>GFE/GFI Description</label><textarea id="pws-gfe" rows="3" placeholder="Describe any GFE or GFI provided..." oninput="saveForms()"></textarea></div>
+          </div>
+          <div class="form-section">
+            <h4>6.0 — Place &amp; Period of Performance</h4>
+            <div class="field-grid">
+              <div class="form-group"><label>Place of Performance</label><input type="text" id="pws-place" oninput="saveForms()"></div>
+              <div class="form-group"><label>Period of Performance</label><input type="text" id="pws-period" placeholder="e.g. 12 months from award" oninput="saveForms()"></div>
+            </div>
+          </div>
+        </div>
+        <div id="pws-tab-sow" class="tab-panel">
+          <div class="form-section">
+            <h4>Statement of Work</h4>
+            <div class="form-group"><label>SOW Narrative</label><textarea id="sow-narrative" rows="16" placeholder="Write your Statement of Work here..." oninput="saveForms()"></textarea></div>
+          </div>
+        </div>
+        <div class="export-bar">
+          <button class="btn btn-primary btn-sm" onclick="exportPWS()">⬇ Export PWS/SOW</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ASSISTANT -->
+    <div class="panel" id="panel-ai">
+      <div class="panel-title">AI Assistant</div>
+      <h1>AI Draft Assistant ✦</h1>
+      <div class="notice" style="color:var(--accent2);border-color:rgba(0,201,167,0.25);background:rgba(0,201,167,0.06)">
+        ✦ Powered by Claude. Your current contract context is automatically included in every request.
+      </div>
+      <div class="ai-quick-prompts">
+        <div class="quick-prompt" onclick="setAIPrompt('Draft a Justification & Approval (J&A) for a sole source procurement')">Draft J&A for sole source</div>
+        <div class="quick-prompt" onclick="setAIPrompt('Draft a Price Negotiation Memorandum (PNM) summary')">Draft PNM</div>
+        <div class="quick-prompt" onclick="setAIPrompt('Write a Determination & Findings (D&F) for use of T&M contract type')">Write D&F for T&M</div>
+        <div class="quick-prompt" onclick="setAIPrompt('Suggest required FAR clauses for a commercial item acquisition under FAR Part 12')">Suggest Part 12 clauses</div>
+        <div class="quick-prompt" onclick="setAIPrompt('Draft an Independent Government Cost Estimate (IGCE) template and instructions')">IGCE template</div>
+        <div class="quick-prompt" onclick="setAIPrompt('Write acquisition plan language for this requirement')">Acquisition plan language</div>
+        <div class="quick-prompt" onclick="setAIPrompt('Review my contract description and suggest any FAR compliance issues')">FAR compliance review</div>
+        <div class="quick-prompt" onclick="setAIPrompt('Draft evaluation criteria for a best value tradeoff source selection')">Evaluation criteria</div>
+      </div>
+      <div class="ai-chat">
+        <div class="ai-messages" id="ai-messages">
+          <div class="msg">
+            <div class="msg-avatar ai">CF</div>
+            <div class="msg-body ai">Hello! I'm ContractForge AI — your federal contracting assistant. I can help you draft contract documents, J&As, D&Fs, PWS language, evaluation criteria, FAR clause selections, and more.
+
+Select a quick prompt above or type your own request. Your current contract context will be included automatically.</div>
+          </div>
+        </div>
+        <div class="ai-input-row">
+          <textarea id="ai-input" placeholder="Ask about FAR requirements, draft contract language, get clause guidance..." onkeydown="handleAIKey(event)"></textarea>
+          <button class="btn btn-primary" onclick="sendAIMessage()">Send ↵</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════ NEW CONTRACT MODAL ═══════════════ -->
+<div class="modal-overlay" id="new-contract-modal">
+  <div class="modal">
+    <h2>New Contract File</h2>
+    <div id="new-contract-form">
+      <label>Contract File Name / Title</label>
+      <input type="text" id="nc-title" placeholder="e.g. IT Support Services FY26">
+      <label>Contract Type</label>
+      <select id="nc-type">
+        <option value="commercial">Commercial (FAR Part 12)</option>
+        <option value="sat">Simplified Acquisition (SAT)</option>
+        <option value="competitive">Full &amp; Open Competitive</option>
+        <option value="construction">Construction</option>
+      </select>
+      <label>Estimated Value ($)</label>
+      <input type="number" id="nc-value" placeholder="0">
+      <label>Contracting Officer</label>
+      <input type="text" id="nc-co" placeholder="Your name">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeNewContractModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createNewContract()">Create Contract File</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCRIPTS (order matters) ═══════════════ -->
+<script src="js/data.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/contracts.js"></script>
+<script src="js/checklist.js"></script>
+<script src="js/clauses.js"></script>
+<script src="js/folder.js"></script>
+<script src="js/forms.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/nav.js"></script>
+
+</body>
+</html>
