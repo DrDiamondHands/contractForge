@@ -532,37 +532,34 @@ function resetSmartChecklist() {
   clUpdateProgress();
 }
 
-// ── Persistence (hooks into existing storage.js pattern) ──────
+// ── Persistence (uses live contracts object via contracts.js) ──
 function clSaveSelections(s) {
-  if (typeof currentContractId === 'undefined' || !currentContractId) return;
-  const contracts = JSON.parse(localStorage.getItem('cf_contracts') || '{}');
-  if (!contracts[currentContractId]) return;
-  contracts[currentContractId].clSelections = s;
-  contracts[currentContractId].clChecked = [...clCheckedItems];
-  localStorage.setItem('cf_contracts', JSON.stringify(contracts));
+  const c = getActive();
+  if (!c) return;
+  c.clSelections = s;
+  c.clChecked = [...clCheckedItems];
+  saveAll();
 }
 
 function clSaveChecked() {
-  if (typeof currentContractId === 'undefined' || !currentContractId) return;
-  const contracts = JSON.parse(localStorage.getItem('cf_contracts') || '{}');
-  if (!contracts[currentContractId]) return;
-  contracts[currentContractId].clChecked = [...clCheckedItems];
-  localStorage.setItem('cf_contracts', JSON.stringify(contracts));
+  const c = getActive();
+  if (!c) return;
+  c.clChecked = [...clCheckedItems];
+  saveAll();
 }
 
 function clLoadForContract(contractId) {
-  const contracts = JSON.parse(localStorage.getItem('cf_contracts') || '{}');
-  const data = contracts[contractId];
-  if (!data || !data.clSelections) return;
+  const c = contracts[contractId];
+  if (!c || !c.clSelections) return;
 
-  const s = data.clSelections;
+  const s = c.clSelections;
   const setIfExists = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
-  setIfExists('cl-sel-type',        s.type);
-  setIfExists('cl-sel-category',    s.category);
-  setIfExists('cl-sel-threshold',   s.threshold);
-  setIfExists('cl-sel-competition', s.competition);
-  setIfExists('cl-sel-setaside',    s.setaside);
-  setIfExists('cl-sel-solicitation',s.solicitation);
+  setIfExists('cl-sel-type',         s.type);
+  setIfExists('cl-sel-category',     s.category);
+  setIfExists('cl-sel-threshold',    s.threshold);
+  setIfExists('cl-sel-competition',  s.competition);
+  setIfExists('cl-sel-setaside',     s.setaside);
+  setIfExists('cl-sel-solicitation', s.solicitation);
 
   // restore toggles
   document.querySelectorAll('#cl-toggles .cl-toggle').forEach(t => {
@@ -573,8 +570,8 @@ function clLoadForContract(contractId) {
 
   // regenerate and restore checked state
   generateSmartChecklist();
-  if (data.clChecked) {
-    data.clChecked.forEach(id => {
+  if (c.clChecked) {
+    c.clChecked.forEach(id => {
       clCheckedItems.add(id);
       const el  = document.getElementById(`clitem-${id}`);
       const chk = document.getElementById(`clchk-${id}`);
