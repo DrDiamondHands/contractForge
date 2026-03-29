@@ -1,0 +1,3 @@
+This version incorporates the Smart Documents Checklist feature. 
+
+Works OK. Still some bugs to sort out.
