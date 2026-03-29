@@ -638,3 +638,149 @@ textarea { resize: vertical; min-height: 90px; }
 
 #new-contract-form input,
 #new-contract-form select { margin-bottom: 10px; }
+
+/* ── Smart Checklist Module ─────────────────────────── */
+.cl-menu-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.cl-menu-heading {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+.cl-menu-subheading {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 1rem 0 .5rem;
+}
+.cl-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.cl-selector {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 12px;
+}
+.cl-selector label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+.cl-selector select {
+  width: 100%;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  padding-right: 16px;
+}
+.cl-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cl-toggle {
+  padding: 5px 11px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-muted);
+  background: var(--bg);
+  user-select: none;
+  transition: all .15s;
+}
+.cl-toggle:hover { border-color: var(--accent); color: var(--text); }
+.cl-toggle--active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.cl-menu-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1rem;
+}
+.cl-doc-count { margin-left: auto; font-size: 12px; color: var(--text-muted); }
+
+/* checklist groups */
+.checklist-group { margin-bottom: 1.25rem; }
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.group-header:hover { background: var(--surface); }
+.group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.group-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.group-count { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+.group-chevron { font-size: 12px; color: var(--text-muted); }
+.checklist-items { display: flex; flex-direction: column; gap: 1px; margin-top: 4px; }
+
+/* individual item */
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background .1s;
+}
+.checklist-item:hover { background: var(--surface); border-color: var(--border); }
+.checklist-item.checked .cl-item-name { text-decoration: line-through; color: var(--text-muted); }
+
+.cl-checkbox {
+  width: 16px; height: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.cl-checkbox.checked { background: var(--surface-dark, #1a1a2e); border-color: var(--accent2); }
+
+.cl-item-body { flex: 1; min-width: 0; }
+.cl-item-name { font-size: 13px; color: var(--text); line-height: 1.4; }
+.cl-item-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.cl-item-note { font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+
+/* tags */
+.cl-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.cl-tag--far        { background: rgba(55,138,221,.12); color: #185FA5; }
+.cl-tag--required   { background: rgba(226,75,74,.10);  color: #A32D2D; }
+.cl-tag--conditional{ background: rgba(186,117,23,.12); color: #633806; }
+.cl-tag--form       { background: rgba(127,119,221,.12);color: #3C3489; }

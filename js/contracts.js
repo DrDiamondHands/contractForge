@@ -136,7 +136,7 @@ function refreshUI() {
 
   // ── Delegate to module renderers ──
   if (hasCon) {
-    renderChecklist();
+    if (typeof clLoadForContract === 'function') clLoadForContract(activeContractId);  // ← replaced renderChecklist()
     renderClauses();
     renderFolderTree();
     prefillSF1449();

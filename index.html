@@ -149,17 +149,129 @@
       </div>
     </div>
 
-    <!-- CHECKLIST -->
-    <div class="panel" id="panel-checklist">
-      <div class="panel-title">Build File</div>
-      <h1>Document Checklist</h1>
-      <div id="checklist-no-contract" class="notice">Select or create a contract file first.</div>
-      <div id="checklist-content" style="display:none">
-        <div class="progress-label" id="cl-progress-label">0 of 0 documents complete</div>
-        <div class="progress-bar-wrap"><div class="progress-bar" id="cl-progress-bar" style="width:0%"></div></div>
-        <div id="checklist-groups"></div>
+<!-- CHECKLIST -->
+<div class="panel" id="panel-checklist">
+  <div class="panel-title">Build File</div>
+  <h1>Document Checklist <span class="contract-type-pill" id="cl-contract-pill"></span></h1>
+  <div id="checklist-no-contract" class="notice">Select or create a contract file first.</div>
+
+  <div id="checklist-content" style="display:none">
+
+    <!-- ── Acquisition Characteristics Menu ── -->
+    <div class="cl-menu-card">
+      <div class="cl-menu-heading">Acquisition Characteristics</div>
+      <div class="cl-selector-grid">
+        <div class="cl-selector">
+          <label>Contract Type</label>
+          <select id="cl-sel-type">
+            <option value="">— Select —</option>
+            <option value="fss">FFP — Firm Fixed Price</option>
+            <option value="fpif">FP-IF — Fixed Price Incentive</option>
+            <option value="cr">Cost Reimbursement</option>
+            <option value="cpff">CPFF — Cost Plus Fixed Fee</option>
+            <option value="cpif">CPIF — Cost Plus Incentive</option>
+            <option value="tm">T&amp;M — Time &amp; Materials</option>
+            <option value="lh">LH — Labor Hour</option>
+            <option value="idiq">IDIQ</option>
+            <option value="bpa">BPA — Blanket Purchase Agreement</option>
+          </select>
+        </div>
+        <div class="cl-selector">
+          <label>Acquisition Category</label>
+          <select id="cl-sel-category">
+            <option value="">— Select —</option>
+            <option value="supplies">Supplies / Products</option>
+            <option value="services">Services (non-construction)</option>
+            <option value="construction">Construction</option>
+            <option value="architect">Architect-Engineer (A-E)</option>
+            <option value="it">Information Technology</option>
+            <option value="research">R&amp;D / Research</option>
+          </select>
+        </div>
+        <div class="cl-selector">
+          <label>Dollar Threshold</label>
+          <select id="cl-sel-threshold">
+            <option value="">— Select —</option>
+            <option value="micro">Micro-purchase (≤ $10K)</option>
+            <option value="sat_under">Simplified (&gt; $10K–$250K)</option>
+            <option value="sat_over">Above SAT ($250K–$2M)</option>
+            <option value="major">Major Acquisition (&gt; $2M)</option>
+            <option value="large">Large ($25M–$100M)</option>
+            <option value="mega">MDAP / Major ($100M+)</option>
+          </select>
+        </div>
+        <div class="cl-selector">
+          <label>Competition Method</label>
+          <select id="cl-sel-competition">
+            <option value="">— Select —</option>
+            <option value="full">Full &amp; Open Competition</option>
+            <option value="sole">Sole Source (FAR 6.302)</option>
+            <option value="limited">Limited Sources</option>
+            <option value="8a_direct">8(a) Direct Award</option>
+            <option value="j_a">J&amp;A Required</option>
+          </select>
+        </div>
+        <div class="cl-selector">
+          <label>Set-Aside Type</label>
+          <select id="cl-sel-setaside">
+            <option value="">— Select / None —</option>
+            <option value="sb">Small Business (SB)</option>
+            <option value="sdvosb">SDVOSB</option>
+            <option value="wosb">WOSB / EDWOSB</option>
+            <option value="8a">8(a) Program</option>
+            <option value="hubzone">HUBZone</option>
+            <option value="none">Unrestricted</option>
+          </select>
+        </div>
+        <div class="cl-selector">
+          <label>Solicitation Method</label>
+          <select id="cl-sel-solicitation">
+            <option value="">— Select —</option>
+            <option value="rfp">RFP — Request for Proposals</option>
+            <option value="ifb">IFB — Invitation for Bids</option>
+            <option value="rfq">RFQ — Request for Quotations</option>
+            <option value="ss">Sole Source / Negotiated</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="cl-menu-subheading">Additional Factors</div>
+      <div class="cl-toggles" id="cl-toggles">
+        <span class="cl-toggle" data-key="dod">DoD / Defense Agency</span>
+        <span class="cl-toggle" data-key="foreign">Foreign Military Sales</span>
+        <span class="cl-toggle" data-key="classified">Classified Work</span>
+        <span class="cl-toggle" data-key="prevailing">Davis-Bacon / SCA Applies</span>
+        <span class="cl-toggle" data-key="haz">Hazardous Materials</span>
+        <span class="cl-toggle" data-key="safety">Safety-Critical Systems</span>
+        <span class="cl-toggle" data-key="cyber">Cybersecurity / IT Security</span>
+        <span class="cl-toggle" data-key="buy_american">Buy American Act</span>
+        <span class="cl-toggle" data-key="enviro">Environmental / NEPA</span>
+        <span class="cl-toggle" data-key="historic">Historic Preservation</span>
+        <span class="cl-toggle" data-key="section508">Section 508 (Accessibility)</span>
+        <span class="cl-toggle" data-key="options">Contract Options Included</span>
+        <span class="cl-toggle" data-key="gfe">GFE / GFP Involved</span>
+        <span class="cl-toggle" data-key="overseas">Overseas / OCONUS</span>
+        <span class="cl-toggle" data-key="oral">Oral Presentations Required</span>
+      </div>
+
+      <div class="cl-menu-actions">
+        <button class="btn btn-primary btn-sm" onclick="generateSmartChecklist()">Generate Checklist</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetSmartChecklist()">Reset</button>
+        <span class="cl-doc-count" id="cl-doc-count"></span>
       </div>
     </div>
+
+    <!-- ── Progress bar ── -->
+    <div class="progress-bar-wrap" style="margin-bottom:1.5rem">
+      <div class="progress-bar" id="cl-progress-bar" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="cl-progress-label">Generate a checklist above to begin</div>
+
+    <!-- ── Dynamic checklist output ── -->
+    <div id="checklist-groups"></div>
+
+  </div>
+</div>
 
     <!-- FAR/DFARS CLAUSES -->
     <div class="panel" id="panel-clauses">
