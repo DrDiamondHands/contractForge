@@ -38,13 +38,13 @@ body {
 header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 14px 28px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
+  gap: 24px;
 }
 
 .logo {
@@ -54,6 +54,7 @@ header {
   color: var(--accent);
   letter-spacing: -0.5px;
   text-shadow: var(--glow);
+  flex-shrink: 0;
 }
 
 .logo span { color: var(--accent2); text-shadow: var(--glow2); }
@@ -62,6 +63,7 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
 }
 
 .contract-selector select,
