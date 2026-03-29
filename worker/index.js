@@ -1,24 +1,32 @@
+import { handleAuth } from './auth.js';
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 export default {
   async fetch(request, env) {
+    const url      = new URL(request.url);
+    const pathname = url.pathname;
+
     // Always handle preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
-
-    const url      = new URL(request.url);
-    const pathname = url.pathname;
 
     // Ignore favicon requests
     if (pathname === '/favicon.ico') {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
+    // ── Auth routes ──
+    if (pathname.startsWith('/api/auth')) {
+      return handleAuth(request, env);
+    }
+
+    // ── Contract routes ──
     try {
       if (pathname === '/api/contracts') {
         if (request.method === 'GET')  return await listContracts(env);
@@ -34,7 +42,6 @@ export default {
       }
 
       return json({ error: 'Not found' }, 404);
-
     } catch (err) {
       console.error(err);
       return json({ error: 'Internal server error', detail: err.message }, 500);
